@@ -22,6 +22,7 @@ const ModalProduct = (props) => {
       </Modal.Body>
       <Modal.Footer>
         <Button
+          color="failure"
           onClick={() => {
             onCloseFunction();
           }}

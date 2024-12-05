@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ProductList from "./ProductList ";
 import ModalProduct from "./Modal";
+import Cart from "./Cart";
+import ModalCart from "./ModalCart";
 
 const DEFAULT_NO_PRODUCT = {
   id: 0,
@@ -169,18 +171,97 @@ const ShoesStore = () => {
     image: "http://svcy3.myclass.vn/images/adidas-prophere.png",
   });
   const [openModal, setOpenModal] = useState(false);
+  const [openModalCart, setOpenModalCart] = useState(false);
+  let [cart, setCart] = useState([]);
+
+  const handleAddProduct = (productInfo) => {
+    const productCart = { ...productInfo, orderQty: 1 };
+
+    const prod = cart.find((item) => {
+      return item.id === productCart.id;
+    });
+
+    if (prod) {
+      prod.orderQty += 1;
+    } else {
+      cart = [...cart, productCart];
+    }
+    const newCart = [...cart];
+    setCart(newCart);
+  };
+
+  const countProduct = () => {
+    let totalOrderQuantity = 0;
+    for (let item of cart) {
+      totalOrderQuantity += item.orderQty;
+    }
+    return totalOrderQuantity;
+  };
+
+  const totalPriceProduct = () => {
+    let totalPrice = 0;
+    for (let item of cart) {
+      totalPrice += item.orderQty * item.price;
+    }
+    return totalPrice.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    });
+  };
+
+  const delProduct = (id) => {
+    const delCart = cart.filter((item) => {
+      return item.id !== id;
+    });
+    setCart(delCart);
+  };
+
+  const updateOrderQuantity = (id, quantity) => {
+    const prod = cart.find((item) => {
+      return item.id === id;
+    });
+    prod.orderQty += quantity;
+
+    if (prod.orderQty === 0) {
+      if (
+        window.confirm(
+          `Do you want to delete the product with ID number ${id} ?`
+        )
+      ) {
+        delProduct(id);
+      } else {
+        prod.orderQty = 1;
+      }
+      return;
+    }
+    const newCart = [...cart];
+    setCart(newCart);
+  };
 
   const onCloseFunction = () => {
     setProductDetail(DEFAULT_NO_PRODUCT);
     setOpenModal(false);
   };
+
   return (
     <div className="container">
+      <Cart setOpenModalCart={setOpenModalCart} countProduct={countProduct} />
+      <ModalCart
+        openModalCart={openModalCart}
+        setOpenModalCart={setOpenModalCart}
+        cart={cart}
+        countProduct={countProduct}
+        totalPriceProduct={totalPriceProduct}
+        delProduct={delProduct}
+        updateOrderQuantity={updateOrderQuantity}
+      />
       <h1 className="title">Shoe Store</h1>
       <ProductList
         products={products}
         setProductDetail={setProductDetail}
         setOpenModal={setOpenModal}
+        handleAddProduct={handleAddProduct}
       />
       <ModalProduct
         content={productDetail}

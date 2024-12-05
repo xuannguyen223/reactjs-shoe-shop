@@ -2,7 +2,7 @@ import React from "react";
 import ProductItem from "./ProductItem";
 
 const ProductList = (props) => {
-  const { products, setProductDetail, setOpenModal } = props;
+  const { products, setProductDetail, setOpenModal, handleAddProduct } = props;
   const renderProduct = () => {
     return products.map((item) => {
       return (
@@ -11,6 +11,7 @@ const ProductList = (props) => {
           detail={item}
           setProductDetail={setProductDetail}
           setOpenModal={setOpenModal}
+          handleAddProduct={handleAddProduct}
         />
       );
     });
